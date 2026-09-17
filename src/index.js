@@ -30,9 +30,24 @@ const MAIN_LOG_CHANNEL_ID = config.MAIN_LOG_CHANNEL_ID || '1550149863038132314';
 const THUMBNAIL_URL = 'https://cdn.discordapp.com/attachments/1549801658224087163/1550044648511377478/Untitled130_20260916115047.png?ex=6aace712&is=6aab9592&hm=a7e338efc67427f75b134ed021a408d7155189f79987789aaf9a1b80aa773596&';
 const SYSTEM_NAME = '[SOLS] 37th Digital Support Terminal';
 
-const dataDir = path.join(__dirname, '..', 'data');
-fs.mkdirSync(dataDir, { recursive: true });
-const db = new Database(path.join(dataDir, 'sols.db'));
+const dataDir = process.env.SOLS_DATA_DIR || path.join(__dirname, '..', 'data');
+try {
+  fs.mkdirSync(dataDir, { recursive: true });
+} catch (e) {
+  // If directory creation fails, fallback to a temp directory
+  const os = require('os');
+  const fallback = path.join(os.tmpdir(), 'sols-data');
+  try {
+    fs.mkdirSync(fallback, { recursive: true });
+  } catch (err) {
+    console.error('Failed to create data directory and fallback. Exiting.');
+    console.error(err);
+    process.exit(1);
+  }
+  process.env.SOLS_DATA_DIR = fallback;
+}
+const dbPath = path.join(process.env.SOLS_DATA_DIR || dataDir, 'sols.db');
+const db = new Database(dbPath);
 
 const pendingReports = new Map();
 const activeTicketUsers = new Map();

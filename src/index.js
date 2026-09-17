@@ -15,11 +15,18 @@ const {
 } = require('discord.js');
 const Database = require('better-sqlite3');
 
-const DISCORD_TOKEN = 'PASTE_YOUR_BOT_TOKEN_HERE';
-const CLIENT_ID = 'PASTE_YOUR_CLIENT_ID_HERE';
-const ADMIN_ID = '1332052367759114301';
-const MAIN_SERVER_ID = '1549377191446581270';
-const MAIN_LOG_CHANNEL_ID = '1550149863038132314';
+let config = {};
+try {
+  config = require('../config.json');
+} catch (error) {
+  config = {};
+}
+
+const DISCORD_TOKEN = config.DISCORD_TOKEN || 'PASTE_YOUR_BOT_TOKEN_HERE';
+const CLIENT_ID = config.CLIENT_ID || 'PASTE_YOUR_CLIENT_ID_HERE';
+const ADMIN_ID = config.ADMIN_ID || '1332052367759114301';
+const MAIN_SERVER_ID = config.MAIN_SERVER_ID || '1549377191446581270';
+const MAIN_LOG_CHANNEL_ID = config.MAIN_LOG_CHANNEL_ID || '1550149863038132314';
 const THUMBNAIL_URL = 'https://cdn.discordapp.com/attachments/1549801658224087163/1550044648511377478/Untitled130_20260916115047.png?ex=6aace712&is=6aab9592&hm=a7e338efc67427f75b134ed021a408d7155189f79987789aaf9a1b80aa773596&';
 const SYSTEM_NAME = '[SOLS] 37th Digital Support Terminal';
 
@@ -652,16 +659,44 @@ async function registerSlashCommands() {
     { name: 'personnel', description: 'Search a SOCOM member profile.', options: [{ name: 'member', description: 'Member name or ID', type: 3, required: false }] },
     { name: 'roster', description: 'Display personnel associated with a division.', options: [{ name: 'division', description: 'Division name', type: 3, required: false }, { name: 'page', description: 'Roster page number', type: 4, required: false }] },
     { name: 'clearance', description: 'Display a user clearance level.', options: [{ name: 'member', description: 'Member name or ID', type: 3, required: false }] },
-    { name: 'mission', description: 'Create or review a mission record.', options: [{ name: 'name', description: 'Mission name', type: 3, required: false }, { name: 'objective', description: 'Mission objective', type: 3, required: false }, { name: 'division', description: 'Division name', type: 3, required: false }, { name: 'status', description: 'Mission status', type: 3, required: false, choices: [{ name: 'PLANNED', value: 'PLANNED' }, { name: 'ACTIVE', value: 'ACTIVE' }, { name: 'COMPLETE', value: 'COMPLETE' }, { name: 'ABORTED', value: 'ABORTED' }] }] },
-    { name: 'deployment', description: 'Track a personnel deployment.', options: [{ name: 'personnel', description: 'Personnel name', type: 3, required: false }, { name: 'unit', description: 'Unit name', type: 3, required: false }, { name: 'mission', description: 'Mission name', type: 3, required: false }, { name: 'status', description: 'Deployment status', type: 3, required: false }] },
-    { name: 'briefing', description: 'Create an official briefing.', options: [{ name: 'title', description: 'Briefing title', type: 3, required: false }, { name: 'content', description: 'Briefing content', type: 3, required: false }, { name: 'division', description: 'Division', type: 3, required: false }, { name: 'priority', description: 'Priority', type: 3, required: false, choices: [{ name: 'ROUTINE', value: 'ROUTINE' }, { name: 'PRIORITY', value: 'PRIORITY' }, { name: 'URGENT', value: 'URGENT' }] }] },
-    { name: 'orders', description: 'Create a roleplay order.', options: [{ name: 'order', description: 'Order details', type: 3, required: false }, { name: 'division', description: 'Division', type: 3, required: false }, { name: 'priority', description: 'Priority', type: 3, required: false, choices: [{ name: 'ROUTINE', value: 'ROUTINE' }, { name: 'PRIORITY', value: 'PRIORITY' }, { name: 'URGENT', value: 'URGENT' }] }] },
+    { name: 'mission', description: 'Create or review a mission record.', options: [
+      { name: 'name', description: 'Mission name', type: 3, required: false },
+      { name: 'objective', description: 'Mission objective', type: 3, required: false },
+      { name: 'division', description: 'Division name', type: 3, required: false },
+      { name: 'status', description: 'Mission status', type: 3, required: false, choices: [{ name: 'PLANNED', value: 'PLANNED' }, { name: 'ACTIVE', value: 'ACTIVE' }, { name: 'COMPLETE', value: 'COMPLETE' }, { name: 'ABORTED', value: 'ABORTED' }] },
+    ] },
+    { name: 'deployment', description: 'Track a personnel deployment.', options: [
+      { name: 'personnel', description: 'Personnel name', type: 3, required: false },
+      { name: 'unit', description: 'Unit name', type: 3, required: false },
+      { name: 'mission', description: 'Mission name', type: 3, required: false },
+      { name: 'status', description: 'Deployment status', type: 3, required: false },
+    ] },
+    { name: 'briefing', description: 'Create an official briefing.', options: [
+      { name: 'title', description: 'Briefing title', type: 3, required: false },
+      { name: 'content', description: 'Briefing content', type: 3, required: false },
+      { name: 'division', description: 'Division', type: 3, required: false },
+      { name: 'priority', description: 'Priority', type: 3, required: false, choices: [{ name: 'ROUTINE', value: 'ROUTINE' }, { name: 'PRIORITY', value: 'PRIORITY' }, { name: 'URGENT', value: 'URGENT' }] },
+    ] },
+    { name: 'orders', description: 'Create a roleplay order.', options: [
+      { name: 'order', description: 'Order details', type: 3, required: false },
+      { name: 'division', description: 'Division', type: 3, required: false },
+      { name: 'priority', description: 'Priority', type: 3, required: false, choices: [{ name: 'ROUTINE', value: 'ROUTINE' }, { name: 'PRIORITY', value: 'PRIORITY' }, { name: 'URGENT', value: 'URGENT' }] },
+    ] },
     { name: 'security', description: 'Display the security state of an authorized server.', options: [{ name: 'server_id', description: 'Target server ID', type: 3, required: false }] },
     { name: 'audit', description: 'Display recent administrative actions.', options: [{ name: 'limit', description: 'Maximum entries', type: 4, required: false }] },
     { name: 'authorize', description: 'Authorize a Discord server for SOLS access.', options: [{ name: 'server_id', description: 'Target server ID', type: 3, required: true }] },
     { name: 'revoke', description: 'Revoke SOCOM authorization from a server.', options: [{ name: 'server_id', description: 'Target server ID', type: 3, required: true }, { name: 'reason', description: 'Revocation reason', type: 3, required: false }] },
-    { name: 'lockdown', description: 'Toggle server lockdown mode.', options: [{ name: 'server_id', description: 'Target server ID', type: 3, required: true }, { name: 'action', description: 'enable or disable', type: 3, required: true, choices: [{ name: 'ENABLE', value: 'enable' }, { name: 'DISABLE', value: 'disable' }] }, { name: 'reason', description: 'Reason for lockdown', type: 3, required: false }] },
-    { name: 'incident', description: 'Create or review a security incident.', options: [{ name: 'server_id', description: 'Target server ID', type: 3, required: false }, { name: 'category', description: 'Incident category', type: 3, required: true, choices: [{ name: 'Unauthorized Access', value: 'Unauthorized Access' }, { name: 'Server Compromise', value: 'Server Compromise' }, { name: 'Bot Abuse', value: 'Bot Abuse' }, { name: 'Data Security', value: 'Data Security' }, { name: 'Personnel Issue', value: 'Personnel Issue' }, { name: 'Infrastructure Issue', value: 'Infrastructure Issue' }, { name: 'Suspicious Activity', value: 'Suspicious Activity' }, { name: 'Other', value: 'Other' }] }, { name: 'severity', description: 'Severity', type: 3, required: true, choices: [{ name: 'LOW', value: 'LOW' }, { name: 'MEDIUM', value: 'MEDIUM' }, { name: 'HIGH', value: 'HIGH' }, { name: 'CRITICAL', value: 'CRITICAL' }] }, { name: 'description', description: 'Incident summary', type: 3, required: true }] },
+    { name: 'lockdown', description: 'Toggle server lockdown mode.', options: [
+      { name: 'server_id', description: 'Target server ID', type: 3, required: true },
+      { name: 'action', description: 'enable or disable', type: 3, required: true, choices: [{ name: 'ENABLE', value: 'enable' }, { name: 'DISABLE', value: 'disable' }] },
+      { name: 'reason', description: 'Reason for lockdown', type: 3, required: false },
+    ] },
+    { name: 'incident', description: 'Create or review a security incident.', options: [
+      { name: 'server_id', description: 'Target server ID', type: 3, required: false },
+      { name: 'category', description: 'Incident category', type: 3, required: true, choices: [{ name: 'Unauthorized Access', value: 'Unauthorized Access' }, { name: 'Server Compromise', value: 'Server Compromise' }, { name: 'Bot Abuse', value: 'Bot Abuse' }, { name: 'Data Security', value: 'Data Security' }, { name: 'Personnel Issue', value: 'Personnel Issue' }, { name: 'Infrastructure Issue', value: 'Infrastructure Issue' }, { name: 'Suspicious Activity', value: 'Suspicious Activity' }, { name: 'Other', value: 'Other' }] },
+      { name: 'severity', description: 'Severity', type: 3, required: true, choices: [{ name: 'LOW', value: 'LOW' }, { name: 'MEDIUM', value: 'MEDIUM' }, { name: 'HIGH', value: 'HIGH' }, { name: 'CRITICAL', value: 'CRITICAL' }] },
+      { name: 'description', description: 'Incident summary', type: 3, required: true },
+    ] },
     { name: 'ticket', description: 'Open a SOLS support ticket.', type: 1 },
     { name: 'report', description: 'Submit a security report to SOLS.', type: 1 },
   ];

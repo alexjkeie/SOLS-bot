@@ -14,11 +14,12 @@ const {
   TextInputStyle,
 } = require('discord.js');
 const Database = require('better-sqlite3');
-require('dotenv').config();
 
-const ADMIN_ID = process.env.ADMIN_ID || '1332052367759114301';
-const MAIN_SERVER_ID = process.env.MAIN_SERVER_ID || '1549377191446581270';
-const MAIN_LOG_CHANNEL_ID = process.env.MAIN_LOG_CHANNEL_ID || '1550149863038132314';
+const DISCORD_TOKEN = 'PASTE_YOUR_BOT_TOKEN_HERE';
+const CLIENT_ID = 'PASTE_YOUR_CLIENT_ID_HERE';
+const ADMIN_ID = '1332052367759114301';
+const MAIN_SERVER_ID = '1549377191446581270';
+const MAIN_LOG_CHANNEL_ID = '1550149863038132314';
 const THUMBNAIL_URL = 'https://cdn.discordapp.com/attachments/1549801658224087163/1550044648511377478/Untitled130_20260916115047.png?ex=6aace712&is=6aab9592&hm=a7e338efc67427f75b134ed021a408d7155189f79987789aaf9a1b80aa773596&';
 const SYSTEM_NAME = '[SOLS] 37th Digital Support Terminal';
 
@@ -640,8 +641,8 @@ async function getCommandListEmbed() {
 }
 
 async function registerSlashCommands() {
-  const clientId = process.env.CLIENT_ID;
-  if (!clientId) {
+  const clientId = CLIENT_ID;
+  if (!clientId || clientId === 'PASTE_YOUR_CLIENT_ID_HERE') {
     console.warn('CLIENT_ID is not configured. Slash commands were not registered.');
     return;
   }
@@ -665,7 +666,7 @@ async function registerSlashCommands() {
     { name: 'report', description: 'Submit a security report to SOLS.', type: 1 },
   ];
 
-  const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+  const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
   await rest.put(Routes.applicationCommands(clientId), { body: commands });
   console.log('Slash commands registered.');
 }
@@ -1272,9 +1273,9 @@ client.on('messageCreate', async (message) => {
 
 initializeDatabase();
 
-const token = process.env.DISCORD_TOKEN;
-if (!token) {
-  console.error('DISCORD_TOKEN is missing. Set it in .env before starting the bot.');
+const token = DISCORD_TOKEN;
+if (!token || token === 'PASTE_YOUR_BOT_TOKEN_HERE') {
+  console.error('DISCORD_TOKEN is missing. Replace the placeholder token in src/index.js before starting the bot.');
   process.exit(1);
 }
 
